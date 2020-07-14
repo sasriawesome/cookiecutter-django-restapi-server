@@ -11,6 +11,13 @@ import os
 
 DEBUG = bool(os.getenv('DEBUG', True))
 
+PROJECT_TITLE = 'REST API'
+PROJECT_SUBTITLE = 'Django REST API'
+PROJECT_DESCRIPTION = """
+    Django REST API boiler plate project template.
+    Speed your API Developmet
+"""
+
 # Build paths
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
@@ -31,6 +38,7 @@ PRODUCTION_APPS = [
     
     'restapi.core',
     'restapi.auth',
+    'restapi.admin',
     'restapi.api',
     'restapi.modules.todo',
 
@@ -41,6 +49,9 @@ PRODUCTION_APPS = [
     "django_rq",
     'django_filters',
 
+    # Admin stuffs
+    'rangefilter',  # https://github.com/silentsokolov/django-admin-rangefilter
+    'admin_numeric_filter',  # https://pypi.org/project/django-admin-numeric-filter/
     'django.contrib.admin',
     'django.contrib.messages',
 

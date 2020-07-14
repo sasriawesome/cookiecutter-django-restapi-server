@@ -6,10 +6,12 @@ from django.conf import settings
 from django.urls import path, include
 from django.contrib import admin
 
+from restapi.admin.sites import admin_site
+
 urlpatterns = [
-    path('api/', include('restapi.api.urls'))
+    path('api/', include('restapi.api.urls')),
     path('admin/', admin.site.urls),
-    
+    path('adminsite/', admin_site.urls)
 ]
 
 if settings.DEBUG:

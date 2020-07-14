@@ -16,6 +16,8 @@ django-redis = "*"
 django-rq = "*"
 django-heroku = "*"
 psycopg2 = "*"
+django-admin-numeric-filter = "*"
+django-admin-rangefilter = "*"
 
 [requires]
 python_version = "3.8"

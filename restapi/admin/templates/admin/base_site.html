@@ -1,0 +1,74 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        #header h1 {
+            font-weight: bold;
+        }
+        #branding {
+            padding-top: 15px !important;
+        }
+        .login #branding {
+            float: left;
+            text-align: center;
+            padding: 15px 0 0 0;
+        }
+        .login #header h1 {
+            margin: 0;
+            font-size: 18px;
+            text-align: center;
+        }
+        .object-tools a {
+            border-radius: 3px;
+            padding-top: 5px !important;
+            padding-bottom: 3px !important;
+        }
+        .admindatefilter input[type="text"] {
+            width: 75%;
+            margin-right: 5px;
+        }
+        .admindatefilter .button , .admindatefilter input[type="submit"] {
+            border: 0 !important;
+            color: #447e9b !important;
+            cursor: pointer !important;
+            margin-right: 15px !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+        #changelist-filter .admin-numeric-filter-wrapper button {
+            float: left !important;
+        }
+        .column-edit_link,
+        .column-delete_link, 
+        .column-view_link{
+            width: 30px;
+        }
+        .deletelink {
+            padding-left: 16px;
+            background-position-x: 1px;
+            background-position-y: 0;
+            margin-right: 5px;
+        }
+        .changelink {
+            margin-right: 5px;
+        }
+        .viewlink {
+            padding-left: 16px;
+            background-position-x: 1px;
+            background-position-y: 1px;
+            margin-right: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django Project')|upper }}</a></h1>
+<p id="site-subtitle">{{ site_sub_title|default:_('Django Project Administration') }}</p>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
