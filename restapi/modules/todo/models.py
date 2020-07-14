@@ -1,6 +1,6 @@
 from django.db import models
 from restapi.core.models import BaseModel
-
+from .workers import send_email
 
 class Work(BaseModel):
 
@@ -13,3 +13,12 @@ class Work(BaseModel):
 
     def __str__(self):
         return self.title
+
+    @staticmethod
+    def send_email(recipient, message):
+        try:
+            send_email(recipient, message)
+            return True
+        except Exception as err:
+            print(err)
+            return False

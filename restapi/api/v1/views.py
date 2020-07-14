@@ -1,5 +1,6 @@
 from django.views import View
 from django.http import JsonResponse
+from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
 from restapi.modules.todo.models import Work
@@ -13,3 +14,8 @@ class RootView(View):
 class WorkViewSet(ModelViewSet):
     queryset = Work.objects.all()
     serializer_class = WorkSerializer
+
+    @action(methods=['get'], detail=False, url_path='notify')
+    def notify(self, request):
+        Work.send_email("Rama", "Hallo")
+        return JsonResponse({'message': "Rama"})

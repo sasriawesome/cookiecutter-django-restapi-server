@@ -1,24 +1,31 @@
 """
 Django settings for {{cookiecutter.project_name}} project.
-
 """
 
 import os
 
+# =============================================================================
 # SECURITY WARNING: 
 # Don't run with debug turned on in production!
-DEBUG = True
+# =============================================================================
+
+DEBUG = bool(os.getenv('DEBUG', True))
 
 # Build paths
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
-SECRET_KEY = '4@yg(=cb50j$#glhp_%a8()1=56b^^i^mh%cq#jp&hq!lmoj*k'
+SITE_ID = os.getenv('SITE_ID', int(1))
+
+BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')
+
+SECRET_KEY = os.getenv('SECRET_KEY', 'important-secret-key')
 
 ALLOWED_HOSTS = ['*']
 
-
+# =============================================================================
 # Application definition
+# =============================================================================
 
 PRODUCTION_APPS = [
     
@@ -28,10 +35,14 @@ PRODUCTION_APPS = [
     'restapi.modules.todo',
 
     'drf_yasg',
-    'rest_framework',
     'djoser',
+    'rest_framework',
 
+    "django_rq",
     'django_filters',
+
+    'django.contrib.admin',
+    'django.contrib.messages',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,8 +51,7 @@ PRODUCTION_APPS = [
 ]
 
 DEVELOPMENT_APPS = [
-    'django.contrib.admin',
-    'django.contrib.messages',
+    # Include only when DEBUG=True
 ]
 
 if DEBUG:
@@ -81,7 +91,9 @@ TEMPLATES = [
     },
 ]
 
+# =============================================================================
 # Database
+# =============================================================================
 
 DATABASES = {
     'default': {
@@ -90,13 +102,20 @@ DATABASES = {
     }
 }
 
+# If using heroku
+# DATABASES['default'].update(
+#    dj_database_url.config(conn_max_age=500, ssl_require=True)
+# )
 
+# =============================================================================
 # Authentications
+# =============================================================================
 
 AUTH_USER_MODEL = 'restapi_auth.User'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
+    'rest_framework_simplejwt.authentication.JWTAuthentication'
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -114,20 +133,33 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# =============================================================================
 # Internationalization
+# =============================================================================
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
+FORMAT_MODULE_PATH = [
+    'restapi.formats',
+]
+
+# =============================================================================
 # Static files (CSS, JavaScript, Images)
+# =============================================================================
+
+# Using AWS Bucket or Digital Ocean Space
+
+# AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'storagename')
+# AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', 'accesskeyid')
+# AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', 'secretaccesskey')
+# AWS_S3_CUSTOM_DOMAIN = os.getenv('AWS_S3_CUSTOM_DOMAIN', 'cdn.amazonaws.com')
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# MEDIA_URL = "https://%s/" % AWS_S3_CUSTOM_DOMAIN
+
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -144,7 +176,21 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 MEDIA_URL = '/media/'
 
+
+# =============================================================================
+# Email Backend
+# =============================================================================
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'restapi.noreply@gmail.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_USER', 'somepassword')
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+
+# =============================================================================
 # REST FRAMEWORK
+# =============================================================================
 
 DEFAULT_RENDERER_CLASSES = (
     'rest_framework.renderers.JSONRenderer',
@@ -174,6 +220,59 @@ REST_FRAMEWORK = {
     ]
 }
 
-SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
+# =============================================================================
+# Redis Cache
+# =============================================================================
+
+CACHE_TTL = 60 * 5
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv('REDIS_URL', 'redis://localhost:6379/2'),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # the password you should use to connect Redis is not URL-safe
+            # "PASSWORD": "mysecret"
+        },
+        "KEY_PREFIX": os.getenv('SITE_NAME', 'instrasite')
+    },
 }
+
+# =============================================================================
+# Redis Queues
+# =============================================================================
+
+RQ_QUEUES = {
+    'default': {
+        'DEFAULT_TIMEOUT': 180,
+        'URL': os.getenv('REDIS_URL', 'redis://localhost:6379/0'), # If you're on Heroku
+    },
+    'high': {
+        'DEFAULT_TIMEOUT': 360,
+        # 'PASSWORD': 'some-password',
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+    },
+    'low': {
+        'DEFAULT_TIMEOUT': 500,
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+    }
+}
+
+# If you need custom exception handlers
+# RQ_EXCEPTION_HANDLERS = ['path.to.my.handler']
+
+# =============================================================================
+# Heroku Setup
+# =============================================================================
+
+# django_heroku.settings(locals())
+
+# try:
+#     from .local import *
+# except ImportError:
+#     pass
