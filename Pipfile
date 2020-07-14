@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+django = "==3.0.8"
+djangorestframework = "==3.11.0"
+djangorestframework-simplejwt = "==4.4.0"
+drf-yasg = {extras = ["validation"], version = "==1.17.1"}
+djoser = "==2.0.3"
+django-filter = "==2.3.0"
+
+[requires]
+python_version = "3.8"
