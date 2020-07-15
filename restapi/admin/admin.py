@@ -6,13 +6,47 @@ from django.template.response import TemplateResponse
 
 from restapi.admin.sites import admin_site
 from admin_numeric_filter.admin import NumericFilterModelAdmin
+from .menus import admin_menu, SubMenu, ModelAdminMenuItem, ModelAdminGroupMenuItem, MenuItem
+
+class ModelAdminMenuMixin(admin.ModelAdmin):
+
+    menu_icon = None
+    menu_label = None
+    menu_order = None
+    menu_class = ModelAdminMenuItem
 
 
-class ModelAdmin(NumericFilterModelAdmin, admin.ModelAdmin):
+    def get_menu_label(self):
+        return self.menu_label or self.opts.verbose_name_plural.title()
+
+    def get_menu_icon(self):
+        return self.menu_icon
+
+    def get_menu_order(self):
+        return self.menu_order or 1000
+
+    def get_menu_class(self):
+        return self.menu_class
+
+    def get_menu_item(self, order=None):
+        
+        def get_menu(request):
+            return self.menu_class(self, order or self.get_menu_order())
+        
+        return get_menu
+
+
+class ModelAdmin(NumericFilterModelAdmin, ModelAdminMenuMixin, admin.ModelAdmin):
     """ Add Inspect view feature to ModelAdmin """
 
     inspect_template = None
     inspect_enabled = False
+
+    def has_any_permission(self, request, obj=None):
+        return (
+            self.has_add_permission(request)
+            or self.has_view_or_change_permission
+        )
 
     def get_urls(self):
         from django.urls import path
@@ -54,7 +88,7 @@ class ModelAdmin(NumericFilterModelAdmin, admin.ModelAdmin):
             return self.changeform_view(request, object_id, form_url, extra_context)
         return self.inspect_view(request, object_id, extra_context)
 
-    def _get_url_name(self, obj, action):
+    def get_url_name(self, action):
         return 'custom_admin:%s_%s_%s' % (
             self.opts.app_label,
             self.opts.model_name,
@@ -73,19 +107,72 @@ class ModelAdmin(NumericFilterModelAdmin, admin.ModelAdmin):
 
     def edit_link(self, obj):
         template = "<a class='changelink' href='%s' title='%s'></a>"
-        url = reverse(self._get_url_name(obj, 'change'), args=(obj.id,))
+        url = reverse(self.get_url_name('change'), args=(obj.id,))
         return format_html(template % (url, _('edit').title()))
-
+    
     def delete_link(self, obj):
         template = "<a class='deletelink' href='%s' title='%s'></a>"
-        url = reverse(self._get_url_name(obj, 'delete'), args=(obj.id,))
+        url = reverse(self.get_url_name('delete'), args=(obj.id,))
         return format_html(template % (url, _('delete').title()))
 
     def view_link(self, obj):
         template = "<a class='viewlink' href='%s' title='%s'></a>"
-        url = reverse(self._get_url_name(obj, 'inspect'), args=(obj.id,))
+        url = reverse(self.get_url_name('inspect'), args=(obj.id,))
         return format_html(template % (url, _('inspect').title()))
 
     edit_link.short_description=''
     delete_link.short_description=''
     view_link.short_description=''
+
+
+class ModelMenuGroup:
+    menu_icon = None
+    menu_label = None
+    menu_order = None
+    adminsite = None
+    items = []
+
+    def __init__(self):
+        self.modeladmins = []
+        self.get_modeladmin_instance()
+
+    def get_items(self):
+        return self.items
+
+    def get_modeladmin_instance(self):
+        if bool(self.items):
+            for model, modeladmin in self.get_items():
+                self.modeladmins.append(
+                    modeladmin(model, self.adminsite)
+                )
+            return self.modeladmins
+        else:
+            return []
+
+    def get_menu_label(self):
+            return self.menu_label
+
+    def get_menu_icon(self):
+        return self.menu_icon
+
+    def get_menu_order(self):
+        return self.menu_order or 1000
+
+    def get_menu_item(self):
+        if self.modeladmins:
+            submenu = SubMenu(self.get_submenu_items())
+            return ModelAdminGroupMenuItem(self, self.get_menu_order(), submenu)
+
+    def get_submenu_items(self):
+        menu_items = []
+        item_order = 1
+        for modeladmin in self.modeladmins:
+            menu_items.append(modeladmin.get_menu_item(order=item_order))
+            item_order += 1
+        return menu_items
+
+@admin_menu.register
+def admin_home_menu(request):
+    return MenuItem(
+        'Home', reverse('admin:index'), 'home', 'home_menu', order=1
+    )

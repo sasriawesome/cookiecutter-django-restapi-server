@@ -4,9 +4,15 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 
+_admin_menu_registry = []
+
+
+def register_menu(func):
+    _admin_menu_registry.append(func)
+
 
 class MenuItem(metaclass=MediaDefiningClass):
-    template = 'sites/shared/navbar_menu_item.html'
+    template = 'admin/sidenav_menu_item.html'
 
     def __init__(self, label, url, icon='', name=None, classnames='',
                  attrs=None, order=1000):
@@ -30,7 +36,7 @@ class MenuItem(metaclass=MediaDefiningClass):
         return True
 
     def is_active(self, request):
-        return request.path.startswith(str(self.url))
+        return request.path == str(self.url)
 
     def get_context(self, request):
         """Defines context for the template, overridable to use more data"""
@@ -50,7 +56,7 @@ class MenuItem(metaclass=MediaDefiningClass):
 
 
 class MenuDropdown(MenuItem):
-    template = 'sites/shared/navbar_menu_dropdown.html'
+    template = 'admin/sidenav_menu_dropdown.html'
 
     """A MenuItem which wraps an inner Menu object"""
 
@@ -72,23 +78,29 @@ class MenuDropdown(MenuItem):
         return context
 
 
+class AdminOnlyMenuItem(MenuItem):
+    """A MenuItem which is only shown to superusers"""
+
+    def is_shown(self, request):
+        return request.user.is_superuser
+
+
 class Menu:
 
     def __init__(self):
         self._registered_menu_items = []
 
-    def register(self, menu_item):
-        if not isinstance(menu_item, MenuItem):
-            raise ValueError('menu_item should be MenuItem subclass')
-        self._registered_menu_items.append(menu_item)
+    def register(self, func):
+        self._registered_menu_items.append(func)
+        
 
     @property
     def registered_menu_items(self):
         return self._registered_menu_items
 
     def menu_items_for_request(self, request):
-        return [item for item in self.registered_menu_items if
-                item.is_shown(request)]
+        menu_items = [item(request) for item in self.registered_menu_items]
+        return [ item for item in menu_items if item.is_shown(request)]
 
     def active_menu_items(self, request):
         return [item for item in self.menu_items_for_request(request) if
@@ -112,80 +124,4 @@ class Menu:
         return mark_safe(''.join(rendered_menu_items))
 
 
-class AdminOnlyMenuItem(MenuItem):
-    """A MenuItem which is only shown to superusers"""
-
-    def is_shown(self, request):
-        return request.user.is_superuser
-
-
-class ModelSiteMenuItem(MenuItem):
-    """
-    A sub-class of MenuItem, include modelsite on init"""
-
-    def __init__(self, modelsite, order):
-        self.modelsite = modelsite
-        self.icon = modelsite.get_menu_icon()
-        url = modelsite.url_helper.get_url('index', False)
-        super().__init__(
-            label=modelsite.get_menu_label(), url=url,
-            icon=self.icon, order=order
-        )
-
-    def is_shown(self, request):
-        return self.modelsite.permission_helper.user_can_list(request.user)
-
-
-class ModelSiteDropdownMenuItem(MenuItem):
-    template = 'sites/shared/navbar_menu_dropdown_item.html'
-
-    def __init__(self, modelsite, order):
-        self.modelsite = modelsite
-        self.icon = modelsite.get_menu_icon()
-        url = modelsite.url_helper.get_url('index', False)
-        super().__init__(
-            label=modelsite.get_menu_label(), url=url,
-            icon=self.icon, order=order
-        )
-
-    def is_shown(self, request):
-        return self.modelsite.permission_helper.user_can_list(request.user)
-
-
-class ModelSiteGroupMenuItem(MenuDropdown):
-    """
-    A sub-class of SubmenuMenuItem, used by ModelAdminGroup to add a
-    link to the main menu with its own submenu, linking to various listing
-    pages
-    """
-
-    def __init__(self, modelsitegroup, order, menu):
-        self.icon = modelsitegroup.get_menu_icon()
-        super().__init__(
-            label=modelsitegroup.get_menu_label(), menu=menu,
-            icon=self.icon, order=order, )
-
-    def is_shown(self, request):
-        """
-        If there aren't any visible items in the submenu, don't bother to show
-        this menu item
-        """
-        for menuitem in self.menu._registered_menu_items:
-            if menuitem.is_shown(request):
-                return True
-        return False
-
-
-class SubMenu(Menu):
-    """
-    A sub-class of wagtail's Menu, used by AppModelAdmin. We just want to
-    override __init__, so that we can specify the items to include on
-    initialisation
-    """
-
-    def __init__(self, menuitem_list):
-        self._registered_menu_items = menuitem_list
-
-
 website_menu = Menu()
-admin_menu = Menu()

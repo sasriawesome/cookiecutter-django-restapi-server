@@ -10,8 +10,7 @@ from restapi.admin.sites import admin_site
 
 urlpatterns = [
     path('api/', include('restapi.api.urls')),
-    path('admin/', admin.site.urls),
-    path('adminsite/', admin_site.urls)
+    path('admin/', admin_site.urls)
 ]
 
 if settings.DEBUG:

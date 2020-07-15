@@ -32,6 +32,7 @@ class WorkAdmin(ModelAdmin):
 
 
 class NoteAdmin(ModelAdmin):
+    menu_label = 'Note'
     inspect_enabled = True
     list_per_page = 10
     list_display = ['title']
@@ -42,3 +43,18 @@ class NoteAdmin(ModelAdmin):
 
 admin_site.register(Note, NoteAdmin)
 admin_site.register(Work, WorkAdmin)
+
+from restapi.admin.menus import admin_menu
+from restapi.admin.admin import ModelMenuGroup
+
+class TodoModelMenuGroup(ModelMenuGroup):
+    adminsite = admin_site
+    menu_icon = 'book'
+    menu_label = 'Todo Menu'
+    menu_order = 5
+    items = [ (Note, NoteAdmin), (Work, WorkAdmin) ]
+
+@admin_menu.register
+def todo_admin_group(request):
+    group = TodoModelMenuGroup()
+    return group.get_menu_item()

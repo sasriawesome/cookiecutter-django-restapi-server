@@ -11,16 +11,10 @@ class CustomAdminSite(AdminSite):
     """ 
         Custom Admin Site provide custom behaviour and Authentication
     """
-    # Text to put at the end of each page's <title>.
     site_title = site_title
-
-    # Text to put in each page's <h1>.
     site_header = site_title
-
-    # Text to put at the top of the admin index page.
     index_title = _('Site administration')
-
-    # URL for the "View site" link at the top of each admin page.
+    
     site_url = '/'
     
     def each_context(self, request):
