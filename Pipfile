@@ -18,6 +18,8 @@ django-heroku = "*"
 psycopg2 = "*"
 django-admin-numeric-filter = "*"
 django-admin-rangefilter = "*"
+django-constance = {extras = ["redis"], version = "*"}
+pillow = "*"
 
 [requires]
 python_version = "3.8"

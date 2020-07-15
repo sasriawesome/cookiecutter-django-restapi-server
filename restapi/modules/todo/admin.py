@@ -41,14 +41,14 @@ class NoteAdmin(ModelAdmin):
         ('created_at', DateRangeFilter)
     ]
 
-admin_site.register(Note, NoteAdmin)
-admin_site.register(Work, WorkAdmin)
+admin.site.register(Note, NoteAdmin)
+admin.site.register(Work, WorkAdmin)
 
 from restapi.admin.menus import admin_menu
 from restapi.admin.admin import ModelMenuGroup
 
 class TodoModelMenuGroup(ModelMenuGroup):
-    adminsite = admin_site
+    adminsite = admin.site
     menu_icon = 'book'
     menu_label = 'Todo Menu'
     menu_order = 5

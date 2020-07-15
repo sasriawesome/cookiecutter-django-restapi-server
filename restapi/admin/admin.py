@@ -45,7 +45,7 @@ class ModelAdmin(NumericFilterModelAdmin, ModelAdminMenuMixin, admin.ModelAdmin)
     def has_any_permission(self, request, obj=None):
         return (
             self.has_add_permission(request)
-            or self.has_view_or_change_permission
+            or self.has_view_or_change_permission(request)
         )
 
     def get_urls(self):
@@ -89,7 +89,8 @@ class ModelAdmin(NumericFilterModelAdmin, ModelAdminMenuMixin, admin.ModelAdmin)
         return self.inspect_view(request, object_id, extra_context)
 
     def get_url_name(self, action):
-        return 'custom_admin:%s_%s_%s' % (
+        return '%s:%s_%s_%s' % (
+            self.admin_site.name,
             self.opts.app_label,
             self.opts.model_name,
             action
@@ -142,6 +143,8 @@ class ModelMenuGroup:
     def get_modeladmin_instance(self):
         if bool(self.items):
             for model, modeladmin in self.get_items():
+                if model not in self.adminsite._registry:
+                    continue
                 self.modeladmins.append(
                     modeladmin(model, self.adminsite)
                 )

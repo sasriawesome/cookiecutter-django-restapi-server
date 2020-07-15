@@ -11,13 +11,6 @@ import os
 
 DEBUG = bool(os.getenv('DEBUG', True))
 
-PROJECT_TITLE = 'Sistem Informasi Sekolah Terpadu'
-PROJECT_SUBTITLE = 'SDN 4 Teluk Pandan, Pesawaran Lampung'
-PROJECT_DESCRIPTION = """
-    Django REST API boiler plate project template.
-    Speed your API Developmet
-"""
-
 # Build paths
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
@@ -42,6 +35,7 @@ PRODUCTION_APPS = [
     'restapi.api',
     'restapi.modules.todo',
 
+    'constance',
     'drf_yasg',
     'djoser',
     'rest_framework',
@@ -240,13 +234,13 @@ CACHE_TTL = 60 * 5
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.getenv('REDIS_URL', 'redis://localhost:6379/2'),
+        "LOCATION": os.getenv('REDIS_URL', 'redis://localhost:6379/0'),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # the password you should use to connect Redis is not URL-safe
             # "PASSWORD": "mysecret"
         },
-        "KEY_PREFIX": os.getenv('SITE_NAME', 'instrasite')
+        "KEY_PREFIX": os.getenv('SITE_NAME', 'restapi')
     },
 }
 
@@ -257,21 +251,87 @@ CACHES = {
 RQ_QUEUES = {
     'default': {
         'DEFAULT_TIMEOUT': 180,
-        'URL': os.getenv('REDIS_URL', 'redis://localhost:6379/0'), # If you're on Heroku
+        'URL': os.getenv('REDIS_URL', 'redis://localhost:6379/1'), # If you're on Heroku
     },
     'high': {
         'DEFAULT_TIMEOUT': 360,
         # 'PASSWORD': 'some-password',
         'HOST': 'localhost',
         'PORT': 6379,
-        'DB': 0,
+        'DB': 1,
     },
     'low': {
         'DEFAULT_TIMEOUT': 500,
         'HOST': 'localhost',
         'PORT': 6379,
-        'DB': 0,
+        'DB': 1,
     }
+}
+
+# =============================================================================
+# Constance Settings
+# =============================================================================
+
+CONSTANCE_BACKEND = 'constance.backends.redisd.RedisBackend'
+
+CONSTANCE_REDIS_CONNECTION = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 3,
+}
+
+PROJECT_TITLE = 'Sistem Informasi Sekolah Terpadu'
+PROJECT_SUBTITLE = 'SDN 4 Teluk Pandan, Pesawaran Lampung'
+PROJECT_DESCRIPTION = """
+    Django REST API boiler plate project template.
+    Speed your API Developmet
+"""
+
+CONSTANCE_ADDITIONAL_FIELDS = {
+    'char_field': ['django.forms.CharField', {}],
+    'image_field': ['django.forms.ImageField', {}],
+    'email_field': ['django.forms.EmailField', {}]
+}
+
+CONSTANCE_CONFIG = {
+    # Website Settings
+    'SITE_LOGO': ('logo.png', 'Website Logo', 'image_field'),
+    'SITE_NAME': ('My Website', 'Website title', 'char_field'),
+    'SITE_SUBTITLE': ('Another Awesome Website', 'Website subtitle', 'char_field'),
+    'SITE_DESCRIPTION': ('Website about good service', 'Website description'),
+    # Company Profile
+    'COMPANY_NAME': (
+        'My Company',
+        'Company or commercial name',
+        'char_field'
+        ),
+    'COMPANY_ADDRESS': (
+        'Jl. Ikan Sebelah No.8, Kec. Pesawahan',
+        'Company address, street name etc.'
+        ),
+    'COMPANY_CITY': ('Bandar Lampung', '', 'char_field'),
+    'COMPANY_PROVINCE': ('Lampung', '', 'char_field'),
+    'COMPANY_POSTALCODE': ('35223', '', 'char_field'),
+    'COMPANY_PHONE': ('0721373767', 'Valid phone number', 'char_field'),
+    'COMPANY_EMAIL': ('mycompany@gmail.com', 'Company email address', 'email_field'),
+}
+
+CONSTANCE_CONFIG_FIELDSETS = {
+    'General Settings': (
+        'SITE_LOGO', 
+        'SITE_NAME', 
+        'SITE_SUBTITLE',
+        'SITE_DESCRIPTION'
+    ),
+    'Company Settings': (
+        'COMPANY_NAME',
+        'COMPANY_ADDRESS',
+        'COMPANY_CITY',
+        'COMPANY_PROVINCE',
+        'COMPANY_POSTALCODE',
+        'COMPANY_PHONE',
+        'COMPANY_EMAIL',
+    ),
 }
 
 # If you need custom exception handlers
