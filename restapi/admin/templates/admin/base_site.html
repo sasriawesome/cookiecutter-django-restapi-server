@@ -1,12 +1,13 @@
 {% extends "admin/base.html" %}
 {% load static %}
 
-{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block title %}{{ title }} | {{ constance.SITE_TITLE }}{% endblock %}
 
 {% block extrastyle %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/metisMenu.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/mm-vertical.css' %}">
+    <link rel="stylesheet" type="text/css" href="//cdn.materialdesignicons.com/5.3.45/css/materialdesignicons.min.css">
     <style>
         #header h1 {
             font-weight: bold;
@@ -52,8 +53,9 @@
             color: #f5dd5d;
         }
         img.sidenav-header-logo {
-            max-width: 100px;
-            margin-bottom: 15px;
+            max-height: 80px;
+            max-width: 120px;
+            margin-bottom: 15px;    
         }
 
         div.breadcrumbs {
@@ -101,9 +103,29 @@
             background-position-y: 1px;
             margin-right: 5px;
         }
+        
+        .footer_menu {
+            background-color: #f8f8f8;
+            padding: 15px 30px;;
+        }
+        .footer_copyright {
+            background-color: #dedede;
+            padding: 15px 30px;
+            text-align: center;
+        }
+        .footer_copyright p {
+            margin: 0;
+        }
     </style>
     {% if has_permission %}
     <style>
+        #content {
+            min-height: 60vh;
+        }
+        .footer {
+            color: white;
+            margin-top: 60px;
+        }
         .breadcrumbs,
         #header, #sidenav {
             box-shadow: 0 1px 3px #888;
@@ -185,8 +207,8 @@
 {% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django Project')|title }}</a></h1>
-<p id="site-subtitle">{{ site_sub_title|default:_('Django Project Administration') }}</p>
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ constance.SITE_TITLE | upper }}</a></h1>
+<p id="site-subtitle">{{ constance.SITE_SUBTITLE }}</p>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
@@ -195,4 +217,18 @@
 <script src="{% static 'admin/js/jquery.min.js' %}"></script>
 <script src="{% static 'admin/js/metismenu.js' %}"></script>
 <script src="{% static 'admin/js/mm-vertical.js' %}"></script>
+{% endblock %}
+
+{% block footer %}
+<div class="footer">
+    <div class="footer_menu">
+        <ul>
+            <li><a href="#">Dokumentasi</a></li>
+            <li><a href="#">Guide</a></li>
+        </ul>
+    </div>
+    <div class="footer_copyright">
+        <p class="small"><a href="#">Copyright © 2019 - 2020</a></p>
+    </div>
+</div>
 {% endblock %}

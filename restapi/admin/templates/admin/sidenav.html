@@ -2,9 +2,12 @@
 <div id="overlay"></div>
 <nav id='sidenav' class="sidenav sidebar-nav">
     <div class="sidenav-header">
-        <img class="sidenav-header-logo" src="{% static 'admin/img/logo.png' %}" alt="branding">
-        <h1>SISTER CLOUD</h1>
-        <span>Versi 1.0.0</span>
+        {% get_media_prefix as MEDIA_URL %}
+        <a href="{% url 'admin:index' %}">
+            <img class="sidenav-header-logo" src="{{ MEDIA_URL }}{{ constance.SITE_LOGO }}" alt="branding">
+        </a>
+        <h1>{{ project_name }}{% if debug_mode %} V.{{ project_version }}{% endif %}</h1>
+        <div><span class="small">{{ constance.FISCAL_DATE_START }} - {{ constance.FISCAL_DATE_END }}</span></div>
     </div>
     {% admin_sidenav %}
 </nav>

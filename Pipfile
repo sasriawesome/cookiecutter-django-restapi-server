@@ -20,6 +20,8 @@ django-admin-numeric-filter = "*"
 django-admin-rangefilter = "*"
 django-constance = {extras = ["redis"], version = "*"}
 pillow = "*"
+django-wkhtmltopdf = "*"
+python-pdf = "==0.37"
 
 [requires]
 python_version = "3.8"

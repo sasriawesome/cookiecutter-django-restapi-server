@@ -1,8 +1,12 @@
 """
 Django settings for {{cookiecutter.project_name}} project.
 """
-
 import os
+import inspect
+import datetime
+import pydf
+from restapi import __version__ as version
+
 
 # =============================================================================
 # SECURITY WARNING: 
@@ -12,6 +16,12 @@ import os
 DEBUG = bool(os.getenv('DEBUG', True))
 
 # Build paths
+PROJECT_NAME = 'SISTER'
+PROJECT_VERSION = version
+PROJECT_DESCRIPTION = """
+    Django REST API boiler plate project template.
+    Speed your API Developmet
+"""
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
 
@@ -91,6 +101,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'restapi.core.context_processors.settings',
             ],
         },
     },
@@ -137,6 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 
 # =============================================================================
 # Internationalization
@@ -268,6 +280,23 @@ RQ_QUEUES = {
     }
 }
 
+
+# =============================================================================
+# Django WKHTMLTOPDF and PYDF
+# =============================================================================
+
+pydf_path = os.path.dirname(inspect.getfile(pydf))
+wkhtml_executable = os.path.join(pydf_path, 'bin','wkhtmltopdf.exe')
+WKHTMLTOPDF_PATH = wkhtml_executable.replace('\\','/')
+
+WKHTMLTOPDF_CMD = os.getenv('WKHTMLTOPDF_CMD', WKHTMLTOPDF_PATH)
+
+
+# Optional 
+# WKHTMLTOPDF_CMD_OPTIONS = {
+#     'quiet': False,
+# }
+
 # =============================================================================
 # Constance Settings
 # =============================================================================
@@ -280,15 +309,11 @@ CONSTANCE_REDIS_CONNECTION = {
     'db': 3,
 }
 
-PROJECT_TITLE = 'Sistem Informasi Sekolah Terpadu'
-PROJECT_SUBTITLE = 'SDN 4 Teluk Pandan, Pesawaran Lampung'
-PROJECT_DESCRIPTION = """
-    Django REST API boiler plate project template.
-    Speed your API Developmet
-"""
-
 CONSTANCE_ADDITIONAL_FIELDS = {
     'char_field': ['django.forms.CharField', {}],
+    'date_field': ['django.forms.DateField', {
+        'widget': 'django.contrib.admin.widgets.AdminDateWidget'
+    }],
     'image_field': ['django.forms.ImageField', {}],
     'email_field': ['django.forms.EmailField', {}]
 }
@@ -296,7 +321,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
 CONSTANCE_CONFIG = {
     # Website Settings
     'SITE_LOGO': ('logo.png', 'Website Logo', 'image_field'),
-    'SITE_NAME': ('My Website', 'Website title', 'char_field'),
+    'SITE_TITLE': ('My Website', 'Website title', 'char_field'),
     'SITE_SUBTITLE': ('Another Awesome Website', 'Website subtitle', 'char_field'),
     'SITE_DESCRIPTION': ('Website about good service', 'Website description'),
     # Company Profile
@@ -311,15 +336,25 @@ CONSTANCE_CONFIG = {
         ),
     'COMPANY_CITY': ('Bandar Lampung', '', 'char_field'),
     'COMPANY_PROVINCE': ('Lampung', '', 'char_field'),
+    'COMPANY_COUNTRY': ('Indonesia', '', 'char_field'),
     'COMPANY_POSTALCODE': ('35223', '', 'char_field'),
     'COMPANY_PHONE': ('0721373767', 'Valid phone number', 'char_field'),
     'COMPANY_EMAIL': ('mycompany@gmail.com', 'Company email address', 'email_field'),
+    # Tahun Anggaran
+    'FISCAL_DATE_START': (datetime.date(2020, 1, 1), 'Fiscal start date', 'date_field'),
+    'FISCAL_DATE_END': (datetime.date(2020, 12, 31), 'Fiscal start date', 'date_field'),
+    # PDF Settings
+    'PDF_MARGIN_TOP': (40, ''),
+    'PDF_MARGIN_LEFT': (30, ''),
+    'PDF_MARGIN_RIGHT': (30, ''),
+    'PDF_MARGIN_BOTTOM': (30, ''),
+    'PDF_ORIENTATION': ('portrait', 'Page orientation')
 }
 
 CONSTANCE_CONFIG_FIELDSETS = {
     'General Settings': (
         'SITE_LOGO', 
-        'SITE_NAME', 
+        'SITE_TITLE', 
         'SITE_SUBTITLE',
         'SITE_DESCRIPTION'
     ),
@@ -331,6 +366,15 @@ CONSTANCE_CONFIG_FIELDSETS = {
         'COMPANY_POSTALCODE',
         'COMPANY_PHONE',
         'COMPANY_EMAIL',
+    ),
+    'Reports Settings': (
+        'FISCAL_DATE_START',
+        'FISCAL_DATE_END',
+        'PDF_MARGIN_TOP',
+        'PDF_MARGIN_LEFT',
+        'PDF_MARGIN_RIGHT',
+        'PDF_MARGIN_BOTTOM',
+        'PDF_ORIENTATION'
     ),
 }
 

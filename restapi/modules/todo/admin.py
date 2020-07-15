@@ -9,7 +9,7 @@ from admin_numeric_filter.admin import (
 )
 
 from restapi.admin.sites import admin_site
-from restapi.admin.admin import ModelAdmin
+from restapi.admin.admin import ModelAdmin, ModelAdminPDFPrintMixin
 from .models import Work, Note
 
 # Custom Django Admin Filter Examples
@@ -17,8 +17,10 @@ class CustomSliderNumericFilter(SliderNumericFilter):
     MAX_DECIMALS = 2
     STEP = 2
 
-class WorkAdmin(ModelAdmin):
+class WorkAdmin(ModelAdminPDFPrintMixin, ModelAdmin):
     inspect_enabled = True
+    menu_icon = 'briefcase-variant'
+    menu_label = 'Pelanggan'
     list_per_page = 10
     list_display = ['title', 'created_at', 'score','is_done']
     search_fields = ['title']
@@ -32,7 +34,8 @@ class WorkAdmin(ModelAdmin):
 
 
 class NoteAdmin(ModelAdmin):
-    menu_label = 'Note'
+    menu_label = 'Permintaan Jasa'
+    menu_icon = 'clipboard-outline'
     inspect_enabled = True
     list_per_page = 10
     list_display = ['title']
@@ -50,7 +53,7 @@ from restapi.admin.admin import ModelMenuGroup
 class TodoModelMenuGroup(ModelMenuGroup):
     adminsite = admin.site
     menu_icon = 'book'
-    menu_label = 'Todo Menu'
+    menu_label = 'Pelayanan Jasa Teknis'
     menu_order = 5
     items = [ (Note, NoteAdmin), (Work, WorkAdmin) ]
 

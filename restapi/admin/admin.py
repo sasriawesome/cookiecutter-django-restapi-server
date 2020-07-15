@@ -3,10 +3,64 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import reverse
 from django.template.response import TemplateResponse
+from django.urls import path
 
-from restapi.admin.sites import admin_site
 from admin_numeric_filter.admin import NumericFilterModelAdmin
-from .menus import admin_menu, SubMenu, ModelAdminMenuItem, ModelAdminGroupMenuItem, MenuItem
+
+from restapi.admin.views import PDFPrintDetailView
+from restapi.admin.sites import admin_site
+from restapi.admin.menus import (
+    admin_menu, 
+    SubMenu,
+    ModelAdminMenuItem,
+    ModelAdminGroupMenuItem,
+    MenuItem
+)
+
+
+class ModelAdminPDFPrintMixin(admin.ModelAdmin):
+
+    print_view_class = PDFPrintDetailView
+    print_template = 'admin/print/content.html'
+    document_title = None
+    document_show_cover = False
+    document_show_header = True
+    document_show_footer = True
+    
+    def get_urls(self):
+        info = self.model._meta.app_label, self.model._meta.model_name
+        urls = super().get_urls()
+        custom_urls = []
+        custom_urls.append(
+            path('<path:object_id>/print/',
+                    self.admin_site.admin_view(self.print_view),
+                    name='%s_%s_print' % info
+                    )
+        )
+        return custom_urls + urls
+
+    def print_view(self, request, object_id, *args, **kwargs):
+        kwargs.update(**{
+            'modeladmin':self,
+            'instance_pk':object_id
+        })
+        view_class = self.print_view_class
+        return view_class.as_view(**kwargs)(request)
+
+    def get_list_display(self, request):
+        list_display = super().get_list_display(request).copy()
+        if self.has_view_or_change_permission(request):
+            list_display.append('print_link')
+        return list_display
+        
+    def print_link(self, obj):
+        template = "<a class='printlink' target='_blank' href='%s' title='%s'>" \
+                   "<i class='mdi mdi-printer'></i></a>"
+        url = reverse(self.get_url_name('print'), args=(obj.id,))
+        return format_html(template % (url, _('print').title()))
+    
+    print_link.short_description=''
+
 
 class ModelAdminMenuMixin(admin.ModelAdmin):
 

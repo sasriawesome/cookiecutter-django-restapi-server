@@ -1,6 +1,9 @@
 .sidebar-nav {
     background: #212529;
 }
+#sidenav i.mdi {
+    margin-right: 15px;
+}
 .sidebar-nav ul {
     padding: 0;
     margin: 0;
