@@ -1,9 +1,12 @@
 {% extends "admin/base.html" %}
+{% load static %}
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block extrastyle %}
     {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/metisMenu.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/mm-vertical.css' %}">
     <style>
         #header h1 {
             font-weight: bold;
@@ -20,6 +23,40 @@
             margin: 0;
             font-size: 18px;
             text-align: center;
+        }
+        #sidenavButton {
+            padding: 10px 10px 5px;
+            background: none;
+            border: 1px solid white;
+            border-radius: 3px;
+        }
+        #sidenavButton span {
+            width: 25px;
+            height: 3px;
+            display: block;
+            background-color: white;
+            margin-bottom: 5px;
+        }
+        .sidenav-header {
+            text-align: center;
+            background: #212529;
+            padding: 30px 30px 15px;
+            border-bottom: 1px solid #112529;
+        }
+        .sidenav-header h1 {
+            margin-bottom: 0;
+            font-weight: bold;
+            color: #f5dd5d;
+        }
+        .sidenav-header span {
+            color: #f5dd5d;
+        }
+        img.sidenav-header-logo {
+            max-width: 100px;
+        }
+
+        div.breadcrumbs {
+            font-size: 12px !important;
         }
         .object-tools a {
             border-radius: 3px;
@@ -64,11 +101,93 @@
             margin-right: 5px;
         }
     </style>
+    {% if has_permission %}
+    <style>
+        #branding h1 {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #branding p {
+            font-size: 12px;
+        }
+        #sidenav {
+            transition: all .2s ease-in;
+            height: 100vh;
+            width: 265px;
+            overflow-y: auto;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+        }
+        #overlay {
+            display: none;
+            height: 0;
+            width: 0;
+            top: 0;
+            left: 0;
+            position: fixed;
+            z-index: 999;
+            background-color: #112529;
+            opacity: 0.5;
+        }
+        #sidenav.active {
+                left: 0;
+            }
+        .sidenav_white{
+            background-color: white;
+        }
+        #container {
+            transition: all .2s ease-in;
+            margin-left: 265px;
+            width: auto;
+        }
+        #sidenavButton {
+            display: none;
+        }
+        @media (max-width: 1024px) {
+            #branding {
+                text-align: center;
+            }
+        }
+        @media (max-width: 767px) {
+            #overlay.active {
+                display: block;
+                height: 100vh;
+                width: 100vw;
+            }
+            #sidenavButton {
+                display: inline-block;
+            }
+            #sidenav {
+                left: -265px;
+            }
+            #container {
+                margin-left: 0;
+            }
+            #sidenav.active {
+                left: 0;
+            }
+        }
+    </style>
+    {% endif %}
+{% endblock %}
+
+{% block sidenav %}
+    {% if has_permission %}
+        {% include 'admin/sidenav.html' %}
+    {% endif %}
 {% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django Project')|upper }}</a></h1>
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django Project')|title }}</a></h1>
 <p id="site-subtitle">{{ site_sub_title|default:_('Django Project Administration') }}</p>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'admin/js/jquery.min.js' %}"></script>
+<script src="{% static 'admin/js/metismenu.js' %}"></script>
+<script src="{% static 'admin/js/mm-vertical.js' %}"></script>
+{% endblock %}

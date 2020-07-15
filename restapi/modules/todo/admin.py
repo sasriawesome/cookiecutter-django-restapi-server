@@ -10,14 +10,13 @@ from admin_numeric_filter.admin import (
 
 from restapi.admin.sites import admin_site
 from restapi.admin.admin import ModelAdmin
-from .models import Work
+from .models import Work, Note
 
 # Custom Django Admin Filter Examples
 class CustomSliderNumericFilter(SliderNumericFilter):
     MAX_DECIMALS = 2
     STEP = 2
 
-# Dont forget extend numeric FilterModelAdmin
 class WorkAdmin(ModelAdmin):
     inspect_enabled = True
     list_per_page = 10
@@ -25,11 +24,21 @@ class WorkAdmin(ModelAdmin):
     search_fields = ['title']
     list_filter = [
         ('created_at', DateRangeFilter),
-        # ('score', SingleNumericFilter), # Single field search, __gte lookup
-        # ('score', RangeNumericFilter), # Range search, __gte and __lte lookup
-        # ('score', SliderNumericFilter), # Same as range above but with slider
-        ('score', CustomSliderNumericFilter), # Filter with custom attributes
+        ('score', SingleNumericFilter), # Single field search, __gte lookup
+        ('score', RangeNumericFilter), # Range search, __gte and __lte lookup
+        ('score', SliderNumericFilter), # Same as range above but with slider
         'is_done',
     ]
 
+
+class NoteAdmin(ModelAdmin):
+    inspect_enabled = True
+    list_per_page = 10
+    list_display = ['title']
+    search_fields = ['title']
+    list_filter = [
+        ('created_at', DateRangeFilter)
+    ]
+
+admin_site.register(Note, NoteAdmin)
 admin_site.register(Work, WorkAdmin)

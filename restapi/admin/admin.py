@@ -28,9 +28,6 @@ class ModelAdmin(NumericFilterModelAdmin, admin.ModelAdmin):
             )
         return custom_urls + urls
 
-    def get_list_display_links(self, request, list_display):
-        return ()
-
     def inspect_view(self, request, object_id, extra_context=None):
         obj = self.get_object(request, object_id)
         if not self.has_view_or_change_permission(request, obj):

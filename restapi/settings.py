@@ -11,8 +11,8 @@ import os
 
 DEBUG = bool(os.getenv('DEBUG', True))
 
-PROJECT_TITLE = 'REST API'
-PROJECT_SUBTITLE = 'Django REST API'
+PROJECT_TITLE = 'Sistem Informasi Sekolah Terpadu'
+PROJECT_SUBTITLE = 'SDN 4 Teluk Pandan, Pesawaran Lampung'
 PROJECT_DESCRIPTION = """
     Django REST API boiler plate project template.
     Speed your API Developmet

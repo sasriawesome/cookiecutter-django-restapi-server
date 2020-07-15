@@ -23,3 +23,16 @@ class Work(BaseModel):
         except Exception as err:
             print(err)
             return False
+
+
+class Note(BaseModel):
+
+    class Meta:
+        verbose_name = 'Note'
+        verbose_name_plural = 'Note'
+    
+    title = models.CharField(max_length=250)
+    description = models.TextField(null=True, blank=False)
+
+    def __str__(self):
+        return self.title
