@@ -1,0 +1,1 @@
+default_app_config = '{{cookiecutter.project_label}}.core.apps.AppConfig'

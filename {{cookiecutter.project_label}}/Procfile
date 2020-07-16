@@ -1,0 +1,3 @@
+release: bash ./Procfile_release.sh
+web: gunicorn {{cookiecutter.project_label}}.wsgi
+worker: python ./manage.py rqworker high default low

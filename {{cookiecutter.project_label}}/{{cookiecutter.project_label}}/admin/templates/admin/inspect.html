@@ -1,0 +1,77 @@
+{% raw %}{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+{{ block.super }}
+<style type="text/css">
+  .module table {
+    width: 100%;
+  }
+  .module table p {
+    padding: 0;
+    margin: 0;
+  }
+  .button_actions {
+    padding: 15px;
+  }
+  .sidebar .module {
+      margin-bottom: 0;
+  }
+  .button_actions input[type="button"],
+  .button_actions .btn,
+  .button_actions input[type="submit"] {
+    width: 100%;
+    display: block;
+  }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; {{ instance|truncatewords:"18" }}
+</div>
+{% endblock %}
+
+{% block title %}{% blocktrans %}Inspecting : {{ instance }}{% endblocktrans %}{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>{{ instance }}</h2>
+  <h2 class="subhead">Table Title</h2>
+  <div class="module">
+    <table class="model">
+      <thead>
+      <tr>
+        <th>{% trans 'Field' %}</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for field in fields|dictsort:"name" %}
+      <tr>
+        <td>{{ field.value }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="small">
+    <a href="{% url opts|admin_urlname:'changelist' %}">&lsaquo; {% trans 'Back to' %} {{ opts.verbose_name_plural|capfirst }}</a>
+  </p>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related" class="sidebar">
+  <div class="module button_actions">
+    <input type="submit" value="Edit" name="_addanother"/>
+    <input type="submit" value="Delete" name="_addanother"/>
+    <input type="submit" value="Print" name="_addanother"/>
+  </div>
+</div>
+{% endblock %}
+{% endraw %}

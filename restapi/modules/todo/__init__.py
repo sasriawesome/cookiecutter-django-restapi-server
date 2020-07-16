@@ -1,1 +1,0 @@
-default_app_config = 'restapi.modules.todo.apps.AppConfig'
