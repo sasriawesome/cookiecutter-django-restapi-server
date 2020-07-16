@@ -285,12 +285,11 @@ RQ_QUEUES = {
 # Django WKHTMLTOPDF and PYDF
 # =============================================================================
 
-pydf_path = os.path.dirname(inspect.getfile(pydf))
-wkhtml_executable = os.path.join(pydf_path, 'bin','wkhtmltopdf.exe')
-WKHTMLTOPDF_PATH = wkhtml_executable.replace('\\','/')
+PYPDF_PATH = os.path.dirname(inspect.getfile(pydf))
+WKHTMLTOPDF_PATH = os.path.join(PYPDF_PATH, 'bin','wkhtmltopdf')
 
-WKHTMLTOPDF_CMD = os.getenv('WKHTMLTOPDF_CMD', WKHTMLTOPDF_PATH)
-
+WKHTMLTOPDF_CMD = os.getenv('WKHTMLTOPDF_CMD', '')
+print(WKHTMLTOPDF_CMD)
 
 # Optional 
 # WKHTMLTOPDF_CMD_OPTIONS = {
