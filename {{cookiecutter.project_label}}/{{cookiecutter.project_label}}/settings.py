@@ -289,7 +289,6 @@ PYPDF_PATH = os.path.dirname(inspect.getfile(pydf))
 WKHTMLTOPDF_PATH = os.path.join(PYPDF_PATH, 'bin','wkhtmltopdf')
 
 WKHTMLTOPDF_CMD = os.getenv('WKHTMLTOPDF_CMD', '')
-print(WKHTMLTOPDF_CMD)
 
 # Optional 
 # WKHTMLTOPDF_CMD_OPTIONS = {

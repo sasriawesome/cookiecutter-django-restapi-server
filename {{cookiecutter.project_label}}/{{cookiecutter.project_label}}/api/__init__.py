@@ -1,1 +1,1 @@
-default_app_config = 'restapi.api.apps.AppConfig'
+default_app_config = '{{cookiecutter.project_label}}.api.apps.AppConfig'
